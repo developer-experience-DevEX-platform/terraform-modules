@@ -10,7 +10,7 @@ Backstage service provisioning will eventually call the module like this:
 
 ```hcl
 module "container_release" {
-  source = "../../../../modules/platform/service-container-release"
+  source = "git::https://github.com/developer-experience-DevEX-platform/terraform-modules.git//platform/service-container-release?ref=v0.2.0"
 
   service_name             = "catalog-api"
   github_owner             = "developer-experience-DevEX-platform"
@@ -30,14 +30,7 @@ The developer never needs to supply or understand the resulting IAM role ARN, AW
 
 **Implemented.** The repository name uses `ecr_repository_name` when supplied and otherwise falls back to `service_name`.
 
-This platform module currently owns the ECR resource directly. It may later compose `modules/aws/ecr` if the ECR behavior becomes reusable outside this platform capability.
-
-Effective defaults:
-
-- Repository name defaults to `service_name`.
-- Image tags are immutable.
-- ECR scan-on-push is enabled.
-- Force deletion is disabled, protecting non-empty repositories from accidental Terraform deletion.
+This platform module composes `aws/ecr`. Image tags are immutable, scan-on-push is enabled, and force deletion is disabled. Callers cannot turn those off.
 
 The reusable `container-release` workflow will eventually publish immutable Git SHA tags in this form:
 
@@ -236,9 +229,6 @@ In short, the developer owns application code and the Dockerfile. The platform o
 | `github_oidc_provider_arn` | `string` | Yes | — | Existing account-level GitHub OIDC provider ARN. |
 | `aws_region` | `string` | Yes | — | Region containing the ECR repository. |
 | `ecr_repository_name` | `string` | No | `""` | Repository override; empty uses `service_name`. |
-| `ecr_image_tag_mutability` | `string` | No | `IMMUTABLE` | ECR tag mutability mode. |
-| `ecr_scan_on_push` | `bool` | No | `true` | Enables ECR scan-on-push. |
-| `force_delete_ecr_repository` | `bool` | No | `false` | Allows deletion of a non-empty repository. |
 | `tags` | `map(string)` | No | `{}` | Additional AWS resource tags. |
 
 ## Outputs

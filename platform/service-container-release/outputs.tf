@@ -1,16 +1,16 @@
 output "ecr_repository_name" {
   description = "ECR repository name."
-  value       = aws_ecr_repository.service.name
+  value       = module.ecr.name
 }
 
 output "ecr_repository_arn" {
   description = "ECR repository ARN."
-  value       = aws_ecr_repository.service.arn
+  value       = module.ecr.arn
 }
 
 output "ecr_repository_url" {
   description = "Full ECR repository URL."
-  value       = aws_ecr_repository.service.repository_url
+  value       = module.ecr.url
 }
 
 output "release_role_name" {

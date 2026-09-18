@@ -3,7 +3,7 @@
 Reusable Terraform modules for the DevEx platform. Live stacks stay in `platform-infrastructure`.
 
 ```text
-aws/          company AWS building blocks
+aws/          s3, ecr, networking, eks, lambda
 platform/     DevEx composition (GitHub, OIDC, service naming)
 ```
 

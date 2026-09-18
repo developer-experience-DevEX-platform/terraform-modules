@@ -18,6 +18,7 @@ jobs:
       matrix:
         module:
           - aws/s3
+          - aws/ecr
           - aws/networking
           - aws/eks
           - aws/lambda

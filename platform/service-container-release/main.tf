@@ -16,16 +16,16 @@ locals {
   )
 }
 
-resource "aws_ecr_repository" "service" {
-  name                 = local.ecr_repository_name
-  image_tag_mutability = var.ecr_image_tag_mutability
-  force_delete         = var.force_delete_ecr_repository
+module "ecr" {
+  source = "../../aws/ecr"
 
-  image_scanning_configuration {
-    scan_on_push = var.ecr_scan_on_push
-  }
-
+  name = local.ecr_repository_name
   tags = local.tags
+}
+
+moved {
+  from = aws_ecr_repository.service
+  to   = module.ecr.aws_ecr_repository.this
 }
 
 data "aws_iam_policy_document" "release_assume_role" {
@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "release_ecr" {
       "ecr:DescribeRepositories",
       "ecr:PutImage",
     ]
-    resources = [aws_ecr_repository.service.arn]
+    resources = [module.ecr.arn]
   }
 }
 
@@ -167,7 +167,7 @@ resource "github_actions_variable" "aws_release_role_arn" {
 resource "github_actions_variable" "ecr_repository" {
   repository    = var.github_repository
   variable_name = "ECR_REPOSITORY"
-  value         = aws_ecr_repository.service.name
+  value         = module.ecr.name
 }
 
 resource "github_actions_variable" "aws_integration_test_role_arn" {

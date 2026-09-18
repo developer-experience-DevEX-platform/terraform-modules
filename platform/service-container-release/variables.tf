@@ -77,29 +77,6 @@ variable "ecr_repository_name" {
   default     = ""
 }
 
-variable "ecr_image_tag_mutability" {
-  description = "Tag mutability setting for the ECR repository."
-  type        = string
-  default     = "IMMUTABLE"
-
-  validation {
-    condition     = contains(["IMMUTABLE", "MUTABLE"], var.ecr_image_tag_mutability)
-    error_message = "ecr_image_tag_mutability must be either IMMUTABLE or MUTABLE."
-  }
-}
-
-variable "ecr_scan_on_push" {
-  description = "Whether ECR scans images when they are pushed."
-  type        = bool
-  default     = true
-}
-
-variable "force_delete_ecr_repository" {
-  description = "Whether Terraform may delete a non-empty ECR repository."
-  type        = bool
-  default     = false
-}
-
 variable "tags" {
   description = "Additional AWS resource tags."
   type        = map(string)
