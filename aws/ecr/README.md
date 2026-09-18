@@ -1,10 +1,5 @@
-# AWS ECR module
+# AWS ECR
 
-Creates one ECR repository with company defaults that callers cannot turn off:
+Creates one ECR repository with locked company defaults.
 
-- Immutable image tags
-- Scan on push
-- AES-256 encryption
-- Force-destroy disabled
-
-Callers pass `name` and optional `tags`. There are no inputs for mutability, scanning, or deletion.
+Docs: [ECR](../../docs/aws/ecr.md)

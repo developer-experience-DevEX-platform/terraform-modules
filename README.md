@@ -1,35 +1,49 @@
 # Terraform modules
 
-Reusable Terraform modules for the DevEx platform. Live stacks stay in `platform-infrastructure`.
+Reusable Terraform modules for this organization.
 
-```text
-aws/          s3, ecr, networking, eks, lambda
-platform/     DevEx composition (GitHub, OIDC, service naming)
-```
+Live stacks stay in `platform-infrastructure`. This repository is the
+module library. CI/CD templates consume what these modules provision;
+they do not create AWS resources.
 
-Pin a git tag. Do not follow `main`.
+`aws` and `platform` are documented. Pin a git tag. Do not follow `main`.
 
-```hcl
-module "artifacts" {
-  source = "git::https://github.com/developer-experience-DevEX-platform/terraform-modules.git//aws/s3?ref=v0.1.0"
+## Start here
 
-  name = "devex-lambda-artifacts-123456789012"
-  tags = {
-    Purpose = "LambdaArtifacts"
-  }
-}
+1. [Getting started](docs/getting-started.md) — paste a stack call and pin a tag
+2. [Overview](docs/overview.md) — two layers, who calls what, locked defaults
+3. Your module: [S3](docs/aws/s3.md), [ECR](docs/aws/ecr.md), or
+   [service container release](docs/platform/service-container-release.md)
 
-module "container_release" {
-  source = "git::https://github.com/developer-experience-DevEX-platform/terraform-modules.git//platform/service-container-release?ref=v0.1.0"
+## AWS primitives
 
-  service_name             = "catalog-api"
-  github_owner             = "developer-experience-DevEX-platform"
-  github_owner_id          = var.github_owner_id
-  github_repository        = "catalog-api"
-  github_repository_id     = var.github_repository_id
-  github_oidc_provider_arn = var.github_oidc_provider_arn
-  aws_region               = "eu-west-2"
-}
-```
+One resource family. Locked company defaults. No GitHub, OIDC, or service
+naming.
 
-`platform` modules may compose `aws` modules with a relative path inside this repository. Application stacks should call `platform` modules for service IAM and OIDC, not `aws` primitives, except environment stacks that own VPC and EKS.
+| Module | Status | Docs |
+| --- | --- | --- |
+| S3 | Available | [docs/aws/s3.md](docs/aws/s3.md) |
+| ECR | Available | [docs/aws/ecr.md](docs/aws/ecr.md) |
+| Networking | Available | [docs/aws/networking.md](docs/aws/networking.md) |
+| EKS | Available | [docs/aws/eks.md](docs/aws/eks.md) |
+| Lambda | Available | [docs/aws/lambda.md](docs/aws/lambda.md) |
+
+How they fit: [docs/aws/README.md](docs/aws/README.md).
+
+## Platform composition
+
+Service IAM, GitHub OIDC, repository variables, and naming. These modules
+may compose `aws` primitives with a relative path inside this repository.
+
+| Module | Status | Docs |
+| --- | --- | --- |
+| Container release | Available | [docs/platform/service-container-release.md](docs/platform/service-container-release.md) |
+| Lambda service | Exists | [docs/platform/service-lambda.md](docs/platform/service-lambda.md) |
+
+How they fit: [docs/platform/README.md](docs/platform/README.md).
+
+## Platform
+
+Tagging, providers, bootstrap vs service stacks, and how we pin versions
+live in [docs/platform.md](docs/platform.md). Application developers do
+not need that page, or this repository.
