@@ -1,10 +1,5 @@
-data "aws_partition" "current" {}
-
-data "aws_caller_identity" "current" {}
-
 locals {
-  ecr_repository_name                   = var.ecr_repository_name != "" ? var.ecr_repository_name : var.service_name
-  integration_test_secret_namespace_arn = "arn:${data.aws_partition.current.partition}:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:${var.service_name}/integration/*"
+  ecr_repository_name = var.ecr_repository_name != "" ? var.ecr_repository_name : var.service_name
 
   tags = merge(
     {
@@ -87,71 +82,6 @@ resource "aws_iam_role_policy" "release_ecr" {
   policy = data.aws_iam_policy_document.release_ecr.json
 }
 
-data "aws_iam_policy_document" "integration_test_assume_role" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    principals {
-      type        = "Federated"
-      identifiers = [var.github_oidc_provider_arn]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:aud"
-      values   = ["sts.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_owner}@${var.github_owner_id}/${var.github_repository}@${var.github_repository_id}:pull_request"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:job_workflow_ref"
-      values   = ["developer-experience-DevEX-platform/ci-cd-templates/.github/workflows/nodejs-ci.yml@refs/heads/main"]
-    }
-  }
-}
-
-resource "aws_iam_role" "integration_test" {
-  name               = "${var.service_name}-github-integration-test"
-  assume_role_policy = data.aws_iam_policy_document.integration_test_assume_role.json
-  tags               = local.tags
-}
-
-moved {
-  from = aws_iam_role.integration_test[0]
-  to   = aws_iam_role.integration_test
-}
-
-data "aws_iam_policy_document" "integration_test_secrets" {
-  statement {
-    sid       = "ReadApprovedIntegrationTestSecrets"
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = [local.integration_test_secret_namespace_arn]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:ResourceTag/RepositoryId"
-      values   = [var.github_repository_id]
-    }
-  }
-}
-
-resource "aws_iam_role_policy" "integration_test_secrets" {
-  name   = "${var.service_name}-integration-test-secrets"
-  role   = aws_iam_role.integration_test.id
-  policy = data.aws_iam_policy_document.integration_test_secrets.json
-}
-
-moved {
-  from = aws_iam_role_policy.integration_test_secrets[0]
-  to   = aws_iam_role_policy.integration_test_secrets
-}
-
 resource "github_actions_variable" "aws_region" {
   repository    = var.github_repository
   variable_name = "AWS_REGION"
@@ -168,17 +98,6 @@ resource "github_actions_variable" "ecr_repository" {
   repository    = var.github_repository
   variable_name = "ECR_REPOSITORY"
   value         = module.ecr.name
-}
-
-resource "github_actions_variable" "aws_integration_test_role_arn" {
-  repository    = var.github_repository
-  variable_name = "AWS_INTEGRATION_TEST_ROLE_ARN"
-  value         = aws_iam_role.integration_test.arn
-}
-
-moved {
-  from = github_actions_variable.aws_integration_test_role_arn[0]
-  to   = github_actions_variable.aws_integration_test_role_arn
 }
 
 resource "github_team_repository" "production_reviewer" {

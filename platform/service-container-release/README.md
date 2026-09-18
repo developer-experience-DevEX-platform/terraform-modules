@@ -107,32 +107,6 @@ only the service's ECR repository
 
 The role cannot delete the repository or images, change lifecycle or repository policies, or administer ECR.
 
-### PR integration-test secret access
-
-**Implemented.** The module always creates a separate `<service_name>-github-integration-test` IAM role and the corresponding `AWS_INTEGRATION_TEST_ROLE_ARN` repository variable during initial service provisioning. Its GitHub OIDC trust is restricted to the immutable service repository identity, the `pull_request` context, and `developer-experience-DevEX-platform/ci-cd-templates/.github/workflows/nodejs-ci.yml@refs/heads/main`. The role can therefore be assumed only through the approved central reusable Node.js CI workflow; feature-branch pushes, main/release jobs, and other workflows cannot assume it.
-
-Integration-test secrets are created and maintained outside Terraform using this naming convention:
-
-```text
-<service_name>/integration/<secret_name>
-```
-
-For example, `payments-api/integration/stripe` and `payments-api/integration/database` follow the standard convention. Terraform does not create, update, rotate, or delete these secrets, and secret values never enter Terraform state.
-
-The role receives only `secretsmanager:GetSecretValue`, scoped to the service's integration namespace:
-
-```text
-arn:<partition>:secretsmanager:<region>:<account>:secret:<service_name>/integration/*
-```
-
-That namespace alone is not sufficient. AWS also requires this resource tag to match:
-
-- `RepositoryId` equals the service repository's immutable numeric GitHub ID.
-
-The manual Platform/Security secret process owns this authorization tag. Application developers cannot grant access merely by adding a declaration to their repository, and the integration-test role has no secret creation, mutation, deletion, or tag-management permissions. A missing or incorrect `RepositoryId` causes AWS to deny `GetSecretValue`.
-
-Adding or rotating a correctly named and tagged secret requires no Terraform change. `.platform/integration-tests.yaml` selects which approved secret is wired into a test environment variable; it does not grant IAM authorization.
-
 ### GitHub Actions variables
 
 **Implemented.**
@@ -142,7 +116,6 @@ The module automatically populates these non-secret, platform-managed repository
 - `AWS_REGION`
 - `AWS_RELEASE_ROLE_ARN`
 - `ECR_REPOSITORY`
-- `AWS_INTEGRATION_TEST_ROLE_ARN`
 
 Application developers do not create or maintain these values. The module does not create `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`, `AWS_ACCOUNT_ID`, or `ECR_REGISTRY`. GitHub Actions obtains short-lived AWS credentials through OIDC, and the registry hostname is discovered during ECR login.
 
