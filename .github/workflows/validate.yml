@@ -1,0 +1,45 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - aws/s3
+          - aws/networking
+          - aws/eks
+          - aws/lambda
+          - platform/service-lambda
+          - platform/service-container-release
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Format
+        working-directory: ${{ matrix.module }}
+        run: terraform fmt -check -recursive
+
+      - name: Init
+        working-directory: ${{ matrix.module }}
+        run: terraform init -backend=false
+
+      - name: Validate
+        working-directory: ${{ matrix.module }}
+        run: terraform validate
