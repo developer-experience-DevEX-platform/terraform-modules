@@ -66,7 +66,7 @@ per-service resource. Pass its ARN into `platform` modules as
 
 | Stack | Calls | Examples |
 | --- | --- | --- |
-| Bootstrap / account | `aws/s3` | Terraform state bucket, Lambda artifact bucket |
+| Bootstrap / account | `aws/s3` | Terraform state bucket, Lambda artifact bucket, TechDocs bucket |
 | Environment | `aws/networking`, `aws/eks` | Staging VPC and cluster |
 | Service | `platform/service-container-release` or `platform/service-lambda` | ECR + release role, or Lambda publish + staging function |
 
@@ -82,6 +82,7 @@ Set per repository by `service-container-release`, not by the team:
 - `AWS_REGION`
 - `AWS_RELEASE_ROLE_ARN`
 - `ECR_REPOSITORY`
+- `TECHDOCS_S3_BUCKET`
 
 The reusable workflow assumes the role with GitHub OIDC. Trust is
 repository- and `main`-scoped. If any variable is unset, Release fails.

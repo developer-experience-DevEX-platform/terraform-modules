@@ -77,6 +77,17 @@ variable "ecr_repository_name" {
   default     = ""
 }
 
+variable "techdocs_bucket_name" {
+  description = "Shared TechDocs bucket from account bootstrap. An empty value uses devex-techdocs-<account-id>."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.techdocs_bucket_name == "" || can(regex("^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$", var.techdocs_bucket_name))
+    error_message = "techdocs_bucket_name must be empty or a valid S3 bucket name."
+  }
+}
+
 variable "tags" {
   description = "Additional AWS resource tags."
   type        = map(string)

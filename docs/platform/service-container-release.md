@@ -16,7 +16,7 @@ ECR repository
     +
 <service>-github-release
     +
-AWS_REGION / AWS_RELEASE_ROLE_ARN / ECR_REPOSITORY
+AWS_REGION / AWS_RELEASE_ROLE_ARN / ECR_REPOSITORY / TECHDOCS_S3_BUCKET
     +
 GitHub production environment
 ```
@@ -90,6 +90,23 @@ Published image:
 
 `latest` is not used. The reusable workflow refuses it.
 
+## TechDocs policy
+
+The same release role may write generated docs to the shared bootstrap
+bucket `devex-techdocs-<account-id>` (override with
+`techdocs_bucket_name`). Access is only:
+
+```text
+default/component/<service_name>/
+```
+
+`s3:ListBucket` is prefix-conditioned. Object actions are
+`s3:GetObject`, `s3:PutObject`, and `s3:DeleteObject` on that prefix.
+Delete is required because each publish replaces the site. The role
+cannot change bucket policy, encryption, or other prefixes.
+
+Callers do not create the bucket. Bootstrap owns it.
+
 ## GitHub Actions variables
 
 Non-secret, platform-managed:
@@ -97,6 +114,7 @@ Non-secret, platform-managed:
 - `AWS_REGION`
 - `AWS_RELEASE_ROLE_ARN`
 - `ECR_REPOSITORY`
+- `TECHDOCS_S3_BUCKET`
 
 The module does not create `AWS_ACCESS_KEY_ID`,
 `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`, `AWS_ACCOUNT_ID`, or
@@ -132,6 +150,7 @@ and does not use this gate.
 | `github_oidc_provider_arn` | — | Required. Account-level provider. |
 | `aws_region` | — | Required. |
 | `ecr_repository_name` | `""` | Empty uses `service_name`. |
+| `techdocs_bucket_name` | `""` | Empty uses `devex-techdocs-<account-id>`. |
 | `production_environment_reviewer_team_ids` | `[19182366]` | One to six team IDs. |
 | `production_environment_prevent_self_review` | `false` | |
 | `tags` | `{}` | |
@@ -145,13 +164,14 @@ and does not use this gate.
 | `ecr_repository_url` | |
 | `release_role_name` | |
 | `release_role_arn` | |
+| `techdocs_bucket_name` | Shared bucket the role may publish into. |
 
 ## Responsibility
 
 | Owner | Owns |
 | --- | --- |
 | Bootstrap | Account OIDC provider, Terraform state, execution identity |
-| This module | ECR, release role, ECR policy, GitHub variables, production environment |
+| This module | ECR, release role, ECR and TechDocs prefix policies, GitHub variables, production environment |
 | Developer | Application code, Dockerfile |
 
 ## Related

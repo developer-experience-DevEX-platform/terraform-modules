@@ -1,5 +1,11 @@
+data "aws_partition" "current" {}
+data "aws_caller_identity" "current" {}
+
 locals {
-  ecr_repository_name = var.ecr_repository_name != "" ? var.ecr_repository_name : var.service_name
+  ecr_repository_name  = var.ecr_repository_name != "" ? var.ecr_repository_name : var.service_name
+  techdocs_bucket_name = var.techdocs_bucket_name != "" ? var.techdocs_bucket_name : "devex-techdocs-${data.aws_caller_identity.current.account_id}"
+  techdocs_bucket_arn  = "arn:${data.aws_partition.current.partition}:s3:::${local.techdocs_bucket_name}"
+  techdocs_prefix      = "default/component/${var.service_name}/"
 
   tags = merge(
     {
@@ -82,6 +88,39 @@ resource "aws_iam_role_policy" "release_ecr" {
   policy = data.aws_iam_policy_document.release_ecr.json
 }
 
+data "aws_iam_policy_document" "release_techdocs" {
+  statement {
+    sid       = "ListServiceTechDocsPrefix"
+    actions   = ["s3:ListBucket"]
+    resources = [local.techdocs_bucket_arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        local.techdocs_prefix,
+        "${local.techdocs_prefix}*",
+      ]
+    }
+  }
+
+  statement {
+    sid = "PublishServiceTechDocs"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = ["${local.techdocs_bucket_arn}/${local.techdocs_prefix}*"]
+  }
+}
+
+resource "aws_iam_role_policy" "release_techdocs" {
+  name   = "${var.service_name}-techdocs-release"
+  role   = aws_iam_role.release.id
+  policy = data.aws_iam_policy_document.release_techdocs.json
+}
+
 resource "github_actions_variable" "aws_region" {
   repository    = var.github_repository
   variable_name = "AWS_REGION"
@@ -98,6 +137,12 @@ resource "github_actions_variable" "ecr_repository" {
   repository    = var.github_repository
   variable_name = "ECR_REPOSITORY"
   value         = module.ecr.name
+}
+
+resource "github_actions_variable" "techdocs_s3_bucket" {
+  repository    = var.github_repository
+  variable_name = "TECHDOCS_S3_BUCKET"
+  value         = local.techdocs_bucket_name
 }
 
 resource "github_team_repository" "production_reviewer" {
