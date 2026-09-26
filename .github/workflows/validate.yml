@@ -18,12 +18,14 @@ jobs:
       matrix:
         module:
           - aws/s3
+          - aws/cloudfront
           - aws/ecr
           - aws/networking
           - aws/eks
           - aws/lambda
           - platform/service-lambda
           - platform/service-container-release
+          - platform/static-site-release
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

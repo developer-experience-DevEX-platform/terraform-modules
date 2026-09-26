@@ -23,6 +23,7 @@ naming.
 | Module | Status | Docs |
 | --- | --- | --- |
 | S3 | Available | [docs/aws/s3.md](docs/aws/s3.md) |
+| CloudFront | Available | [docs/aws/cloudfront.md](docs/aws/cloudfront.md) |
 | ECR | Available | [docs/aws/ecr.md](docs/aws/ecr.md) |
 | Networking | Available | [docs/aws/networking.md](docs/aws/networking.md) |
 | EKS | Available | [docs/aws/eks.md](docs/aws/eks.md) |
@@ -38,6 +39,7 @@ may compose `aws` primitives with a relative path inside this repository.
 | Module | Status | Docs |
 | --- | --- | --- |
 | Container release | Available | [docs/platform/service-container-release.md](docs/platform/service-container-release.md) |
+| Static site release | Available | [docs/platform/static-site-release.md](docs/platform/static-site-release.md) |
 | Lambda service | Exists | [docs/platform/service-lambda.md](docs/platform/service-lambda.md) |
 
 How they fit: [docs/platform/README.md](docs/platform/README.md).

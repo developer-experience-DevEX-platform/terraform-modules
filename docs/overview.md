@@ -21,8 +21,9 @@ Two module families:
 environment stack                 service stack
       ↓                                 ↓
 aws/networking                    platform/service-container-release
-aws/eks                                 ↓
-aws/s3                            aws/ecr   (relative compose)
+aws/eks                           platform/static-site-release
+aws/s3                                  ↓
+                                  aws/ecr or aws/s3 + aws/cloudfront
 ```
 
 | Layer | Lives in | Owns |

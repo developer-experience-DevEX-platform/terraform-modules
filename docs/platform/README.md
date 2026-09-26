@@ -10,6 +10,7 @@ Application developers do not call these. Backstage and
 | Module | Status | What it provisions |
 | --- | --- | --- |
 | [Container release](service-container-release.md) | Available | ECR, `*-github-release` role, GitHub variables, production environment |
+| [Static site release](static-site-release.md) | Available | S3, CloudFront, `*-github-release` role, GitHub variables, production environment |
 | [Lambda service](service-lambda.md) | Exists | Artifact prefix IAM, staging function, release and deploy roles |
 
 ```text
