@@ -29,7 +29,6 @@ module "site" {
 }
 
 # CloudFront in front of the content bucket.
-# Wait for the site module so a removed TLS-only policy is gone first.
 module "cdn" {
   source = "../../aws/cloudfront"
 
@@ -38,8 +37,6 @@ module "cdn" {
   bucket_arn                  = module.site.arn
   bucket_regional_domain_name = module.site.bucket_regional_domain_name
   tags                        = local.tags
-
-  depends_on = [module.site]
 }
 
 # Trust only this repo and branch via the account OIDC provider.
