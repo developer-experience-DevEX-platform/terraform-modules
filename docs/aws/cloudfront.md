@@ -21,7 +21,8 @@ composes it.
 - IPv6 on
 - The origin bucket stays private; only this distribution can `GetObject`
 - Replaces the origin bucket policy and keeps the TLS-only deny
-- Standard access logs go to `${name}-cf-logs` (that bucket does not log to itself)
+- CloudFront legacy S3 access logs are omitted; `PutBucketAcl` rejects the
+  `awslogsdelivery` canonical ID. Site-bucket S3 access logs stay on.
 
 ## Caller
 
@@ -45,7 +46,7 @@ module "cdn" {
 
 | Input | Required | Notes |
 | --- | --- | --- |
-| `name` | yes | Origin access control name, at most 55 characters so `${name}-cf-logs` fits. |
+| `name` | yes | Origin access control name, at most 64 characters. |
 | `bucket_name` | yes | Private origin bucket. |
 | `bucket_arn` | yes | Used in the bucket policy. |
 | `bucket_regional_domain_name` | yes | CloudFront origin domain. |

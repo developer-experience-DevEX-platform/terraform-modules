@@ -3,8 +3,8 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = length(var.name) >= 1 && length(var.name) <= 55
-    error_message = "name must be between 1 and 55 characters so the CloudFront logs bucket name fits."
+    condition     = length(var.name) >= 1 && length(var.name) <= 64
+    error_message = "name must be between 1 and 64 characters."
   }
 }
 

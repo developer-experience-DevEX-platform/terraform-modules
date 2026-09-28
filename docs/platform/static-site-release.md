@@ -8,7 +8,7 @@ infrastructure; application developers keep frontend code. There is no
 ECR, Dockerfile, or Kubernetes.
 
 The module composes `aws/s3` and `aws/cloudfront`. Callers cannot turn
-off TLS, access logging, or origin access control.
+off TLS, S3 access logging, or origin access control.
 
 ## What it creates
 
@@ -18,8 +18,6 @@ off TLS, access logging, or origin access control.
 <service>-<account-id>-logs
     +
 CloudFront distribution
-    +
-<service>-cf-logs
     +
 <service>-github-release
     +
@@ -33,7 +31,7 @@ GitHub production environment
 
 ```hcl
 module "static_site_release" {
-  source = "git::https://github.com/developer-experience-DevEX-platform/terraform-modules.git//platform/static-site-release?ref=v0.4.0"
+  source = "git::https://github.com/developer-experience-DevEX-platform/terraform-modules.git//platform/static-site-release?ref=v0.6.0"
 
   service_name             = "billing-ui"
   github_owner             = "developer-experience-DevEX-platform"
