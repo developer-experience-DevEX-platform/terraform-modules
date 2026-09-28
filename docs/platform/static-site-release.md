@@ -33,7 +33,7 @@ GitHub production environment
 
 ```hcl
 module "static_site_release" {
-  source = "git::https://github.com/developer-experience-DevEX-platform/terraform-modules.git//platform/static-site-release?ref=v0.7.0"
+  source = "git::https://github.com/developer-experience-DevEX-platform/terraform-modules.git//platform/static-site-release?ref=v0.8.0"
 
   service_name             = "billing-ui"
   github_owner             = "developer-experience-DevEX-platform"
