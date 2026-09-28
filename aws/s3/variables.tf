@@ -13,3 +13,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "attach_bucket_policy" {
+  description = "Attach the TLS-only policy to the content bucket. Set false when CloudFront owns the origin policy."
+  type        = bool
+  default     = true
+}

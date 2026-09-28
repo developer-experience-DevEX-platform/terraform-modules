@@ -85,7 +85,10 @@ data "aws_iam_policy_document" "tls_only" {
 }
 
 # Attach the TLS-only policy to the content bucket.
+# CloudFront origin buckets skip this; that module owns the policy.
 resource "aws_s3_bucket_policy" "tls_only" {
+  count = var.attach_bucket_policy ? 1 : 0
+
   bucket = aws_s3_bucket.this.id
   policy = data.aws_iam_policy_document.tls_only.json
 

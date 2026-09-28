@@ -20,7 +20,8 @@ composes it.
 - Managed `CachingOptimized` cache policy
 - IPv6 on
 - The origin bucket stays private; only this distribution can `GetObject`
-- Replaces the origin bucket policy and keeps the TLS-only deny
+- This module is the only writer of the origin bucket policy (TLS deny plus
+  CloudFront `GetObject`)
 - CloudFront legacy S3 access logs are omitted; `PutBucketAcl` rejects the
   `awslogsdelivery` canonical ID. Site-bucket S3 access logs stay on.
 

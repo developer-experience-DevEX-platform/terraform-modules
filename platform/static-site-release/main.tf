@@ -19,14 +19,17 @@ locals {
 }
 
 # Private content bucket plus S3 access-log bucket.
+# CloudFront attaches the origin policy (TLS deny plus GetObject).
 module "site" {
   source = "../../aws/s3"
 
-  name = local.site_bucket_name
-  tags = local.tags
+  name                 = local.site_bucket_name
+  attach_bucket_policy = false
+  tags                 = local.tags
 }
 
-# CloudFront in front of the content bucket, plus CloudFront logs.
+# CloudFront in front of the content bucket.
+# Wait for the site module so a removed TLS-only policy is gone first.
 module "cdn" {
   source = "../../aws/cloudfront"
 
@@ -35,6 +38,8 @@ module "cdn" {
   bucket_arn                  = module.site.arn
   bucket_regional_domain_name = module.site.bucket_regional_domain_name
   tags                        = local.tags
+
+  depends_on = [module.site]
 }
 
 # Trust only this repo and branch via the account OIDC provider.

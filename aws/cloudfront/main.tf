@@ -118,7 +118,7 @@ data "aws_iam_policy_document" "origin" {
   }
 }
 
-# Replace the site bucket policy with the origin document above.
+# Only policy on the origin bucket: TLS-only, plus GetObject for this distribution.
 resource "aws_s3_bucket_policy" "origin" {
   bucket = var.bucket_name
   policy = data.aws_iam_policy_document.origin.json
